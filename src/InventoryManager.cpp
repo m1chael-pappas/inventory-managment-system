@@ -24,7 +24,7 @@ void InventoryManager::updateProduct(int id, const Product &updatedProduct)
 
     if (it != products.end())
     {
-        // Update all fields except id
+
         it->setName(updatedProduct.getName());
         it->setCategory(updatedProduct.getCategory());
         it->setPrice(updatedProduct.getPrice());

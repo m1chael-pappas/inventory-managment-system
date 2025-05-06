@@ -111,7 +111,6 @@ bool MainWindow::validateForm()
         isValid = false;
     }
 
-    // Check if category is empty
     if (categoryEdit->text().trimmed().isEmpty())
     {
         errorMessage += "- Category cannot be empty\n";
@@ -284,7 +283,7 @@ void MainWindow::updateTable()
         QTableWidgetItem *quantityItem = new QTableWidgetItem(QString::number(product.getQuantity()));
         quantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-        // Highlight low stock items (less than 10 units)
+        // Highlight low stock items
         if (product.getQuantity() < 10)
         {
             quantityItem->setBackground(QColor(255, 200, 200)); // Light red background
@@ -406,13 +405,10 @@ void MainWindow::showInventoryValueChart()
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
 
-    // Add the chart view to the layout
     layout->addWidget(chartView);
 
-    // Show the dialog
     chartDialog->exec();
 
-    // Clean up
     delete chartDialog;
 }
 
