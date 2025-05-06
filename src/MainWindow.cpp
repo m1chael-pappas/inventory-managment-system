@@ -1,13 +1,17 @@
 
 #include "includes/MainWindow.h"
+
 #include <QVBoxLayout>
-#include <QPushButton>
-#include <QLabel>
+#include <QHBoxLayout>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QStatusBar>
+#include <QDialog>
+#include <QFileDialog>
+#include <QProgressBar>
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -64,19 +68,73 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     mainLayout->addLayout(buttonLayout);
 
+    // Create visualization buttons
+    QHBoxLayout *chartButtonLayout = new QHBoxLayout();
+    QPushButton *valueChartButton = new QPushButton("Show Value Chart");
+    QPushButton *distributionChartButton = new QPushButton("Show Distribution Chart");
+
+    chartButtonLayout->addWidget(valueChartButton);
+    chartButtonLayout->addWidget(distributionChartButton);
+
+    mainLayout->addLayout(chartButtonLayout);
+
+    // Create export button
+    QHBoxLayout *vizButtonLayout = new QHBoxLayout();
+    QPushButton *exportButton = new QPushButton("Export to CSV");
+
+    vizButtonLayout->addWidget(exportButton);
+
+    mainLayout->addLayout(vizButtonLayout);
+
     // Connect signals and slots
     connect(addButton, &QPushButton::clicked, this, &MainWindow::addProduct);
     connect(updateButton, &QPushButton::clicked, this, &MainWindow::updateProduct);
     connect(removeButton, &QPushButton::clicked, this, &MainWindow::removeProduct);
     connect(clearButton, &QPushButton::clicked, this, &MainWindow::clearForm);
     connect(productTable, &QTableWidget::itemSelectionChanged, this, &MainWindow::selectionChanged);
+    connect(valueChartButton, &QPushButton::clicked, this, &MainWindow::showInventoryValueChart);
+    connect(distributionChartButton, &QPushButton::clicked, this, &MainWindow::showCategoryDistributionChart);
+    connect(exportButton, &QPushButton::clicked, this, &MainWindow::exportToCSV);
 
     // Initialize inventory manager and update table
     updateTable();
 }
 
+bool MainWindow::validateForm()
+{
+    bool isValid = true;
+    QString errorMessage;
+
+    if (nameEdit->text().trimmed().isEmpty())
+    {
+        errorMessage += "- Product name cannot be empty\n";
+        isValid = false;
+    }
+
+    // Check if category is empty
+    if (categoryEdit->text().trimmed().isEmpty())
+    {
+        errorMessage += "- Category cannot be empty\n";
+        isValid = false;
+    }
+
+    if (!isValid)
+    {
+        QMessageBox::warning(this, "Validation Error",
+                             "Please correct the following errors:\n\n" + errorMessage);
+    }
+
+    return isValid;
+}
+
 void MainWindow::addProduct()
 {
+
+    if (!validateForm())
+    {
+        return;
+    }
+
     Product product(
         0,
         nameEdit->text().toStdString(),
@@ -245,4 +303,164 @@ void MainWindow::updateTable()
 
     // Update status bar with total inventory value
     statusBar()->showMessage(QString("Total Inventory Value: $%1").arg(inventoryTotal, 0, 'f', 2));
+}
+
+void MainWindow::exportToCSV()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    "Export Inventory", "", "CSV Files (*.csv)");
+
+    if (filename.isEmpty())
+    {
+        return;
+    }
+
+    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QMessageBox::critical(this, "Error", "Could not open file for writing.");
+        return;
+    }
+
+    QTextStream stream(&file);
+
+    // Write header
+    stream << "ID,Name,Category,Price,Quantity,Description,Total Value\n";
+
+    // Write data
+    const std::vector<Product> &products = inventoryManager.getAllProducts();
+    for (const auto &product : products)
+    {
+        double totalValue = product.getPrice() * product.getQuantity();
+
+        stream << product.getId() << ","
+               << "\"" << QString::fromStdString(product.getName()).replace("\"", "\"\"") << "\","
+               << "\"" << QString::fromStdString(product.getCategory()).replace("\"", "\"\"") << "\","
+               << product.getPrice() << ","
+               << product.getQuantity() << ","
+               << "\"" << QString::fromStdString(product.getDescription()).replace("\"", "\"\"") << "\","
+               << totalValue << "\n";
+    }
+
+    file.close();
+    QMessageBox::information(this, "Success", "Inventory exported successfully to " + filename);
+}
+
+void MainWindow::showInventoryValueChart()
+{
+    // Create a dialog to display the chart
+    QDialog *chartDialog = new QDialog(this);
+    chartDialog->setWindowTitle("Inventory Value by Category");
+    chartDialog->resize(600, 400);
+
+    // Create a vertical layout for the dialog
+    QVBoxLayout *layout = new QVBoxLayout(chartDialog);
+
+    // Group products by category and calculate total value
+    std::map<std::string, double> categoryValues;
+    const std::vector<Product> &products = inventoryManager.getAllProducts();
+
+    for (const auto &product : products)
+    {
+        double value = product.getPrice() * product.getQuantity();
+        categoryValues[product.getCategory()] += value;
+    }
+
+    // Create a single bar set for all categories
+    QBarSeries *series = new QBarSeries();
+
+    // Add a bar set for each category
+    for (const auto &pair : categoryValues)
+    {
+        QBarSet *barSet = new QBarSet(QString::fromStdString(pair.first));
+        *barSet << pair.second;
+        series->append(barSet);
+    }
+
+    // Create the chart and add the series
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Inventory Value by Category");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    // Create the axes
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setTitleText("Value ($)");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    // Add a simple axis with just "Categories" as the label
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append("Categories");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    // Hide the x-axis labels since they're redundant
+    axisX->setLabelsVisible(false);
+
+    // Make the legend visible to identify categories
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignRight);
+
+    // Create chart view
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    // Add the chart view to the layout
+    layout->addWidget(chartView);
+
+    // Show the dialog
+    chartDialog->exec();
+
+    // Clean up
+    delete chartDialog;
+}
+
+void MainWindow::showCategoryDistributionChart()
+{
+    // Create a dialog to display the chart
+    QDialog *chartDialog = new QDialog(this);
+    chartDialog->setWindowTitle("Product Distribution by Category");
+    chartDialog->resize(600, 400);
+
+    // Create a vertical layout for the dialog
+    QVBoxLayout *layout = new QVBoxLayout(chartDialog);
+
+    // Create a pie series for the chart
+    QPieSeries *series = new QPieSeries();
+
+    // Group products by category and count
+    std::map<std::string, int> categoryCount;
+    const std::vector<Product> &products = inventoryManager.getAllProducts();
+
+    for (const auto &product : products)
+    {
+        categoryCount[product.getCategory()]++;
+    }
+
+    // Add slices for each category
+    for (const auto &pair : categoryCount)
+    {
+        series->append(QString::fromStdString(pair.first), pair.second);
+    }
+
+    // Create the chart and add the series
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Product Distribution by Category");
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignRight);
+
+    // Create chart view
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    // Add the chart view to the layout
+    layout->addWidget(chartView);
+
+    // Show the dialog
+    chartDialog->exec();
+
+    // Clean up
+    delete chartDialog;
 }

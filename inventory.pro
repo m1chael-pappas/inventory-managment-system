@@ -1,5 +1,5 @@
 # inventory.pro
-QT += core gui widgets
+QT += core gui widgets charts
 
 TARGET = inventory_management
 TEMPLATE = app
