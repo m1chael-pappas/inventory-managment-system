@@ -37,94 +37,94 @@ public:
      * @brief Get the product ID
      * @return The product ID
      */
-    int getId() const;
+    int get_id() const;
 
     /**
      * @brief Get the product name
      * @return The product name
      */
-    std::string getName() const;
+    std::string get_name() const;
 
     /**
      * @brief Get the product category
      * @return The product category
      */
-    std::string getCategory() const;
+    std::string get_category() const;
 
     /**
      * @brief Get the unit price
      * @return The unit price
      */
-    double getPrice() const;
+    double get_price() const;
 
     /**
      * @brief Get the available quantity
      * @return The available quantity
      */
-    int getQuantity() const;
+    int get_quantity() const;
 
     /**
      * @brief Get the product description
      * @return The product description
      */
-    std::string getDescription() const;
+    std::string get_description() const;
 
     // Setters
     /**
      * @brief Set the product ID
-     * @param newId The new ID value
+     * @param new_id The new ID value
      */
-    void setId(int newId);
+    void set_id(int new_id);
 
     /**
      * @brief Set the product name
-     * @param newName The new name value
+     * @param new_name The new name value
      */
-    void setName(const std::string &newName);
+    void set_name(const std::string &new_name);
 
     /**
      * @brief Set the product category
-     * @param newCategory The new category value
+     * @param new_category The new category value
      */
-    void setCategory(const std::string &newCategory);
+    void set_category(const std::string &new_category);
 
     /**
      * @brief Set the unit price
-     * @param newPrice The new price value
+     * @param new_price The new price value
      */
-    void setPrice(double newPrice);
+    void set_price(double new_price);
 
     /**
      * @brief Set the available quantity
-     * @param newQuantity The new quantity value
+     * @param new_quantity The new quantity value
      */
-    void setQuantity(int newQuantity);
+    void set_quantity(int new_quantity);
 
     /**
      * @brief Set the product description
-     * @param newDescription The new description value
+     * @param new_description The new description value
      */
-    void setDescription(const std::string &newDescription);
+    void set_description(const std::string &new_description);
 
     // Helper methods
     /**
      * @brief Calculate the total value of this product (price * quantity)
      * @return The total value
      */
-    double getTotalValue() const;
+    double get_total_value() const;
 
     /**
      * @brief Check if the product is below the given stock threshold
      * @param threshold The minimum quantity threshold
      * @return true if quantity is below threshold, false otherwise
      */
-    bool isLowStock(int threshold) const;
+    bool is_low_stock(int threshold) const;
 
     /**
      * @brief Get a string representation of the product
      * @return A formatted string with product details
      */
-    std::string toString() const;
+    std::string to_string() const;
 
     // For inventory manager internal use
     friend class InventoryManager;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "InventoryManager.h"
+#include "inventory_manager.h"
 
 // Qt includes
 #include <QMainWindow>
@@ -39,61 +39,61 @@ private:
      * @brief Validate the product input form
      * @return true if all fields are valid, false otherwise
      */
-    bool validateForm();
+    bool validate_form();
 
 private slots:
     /**
      * @brief Add a new product using the form data
      */
-    void addProduct();
+    void add_product();
 
     /**
      * @brief Update the selected product with the form data
      */
-    void updateProduct();
+    void update_product();
 
     /**
      * @brief Remove the selected product from inventory
      */
-    void removeProduct();
+    void remove_product();
 
     /**
      * @brief Clear all form fields and selection
      */
-    void clearForm();
+    void clear_form();
 
     /**
      * @brief Handle product selection in the table
      */
-    void selectionChanged();
+    void selection_changed();
 
     /**
      * @brief Refresh the product table with current data
      */
-    void updateTable();
+    void update_table();
 
     /**
      * @brief Display a chart showing inventory value by category
      */
-    void showInventoryValueChart();
+    void show_inventory_value_chart();
 
     /**
      * @brief Display a chart showing product count distribution by category
      */
-    void showCategoryDistributionChart();
+    void show_category_distribution_chart();
 
     /**
      * @brief Export inventory data to a CSV file
      */
-    void exportToCSV();
+    void export_to_csv();
 
 private:
-    QTableWidget *productTable;
-    QLineEdit *nameEdit;
-    QLineEdit *categoryEdit;
-    QDoubleSpinBox *priceSpinBox;
-    QSpinBox *quantitySpinBox;
-    QLineEdit *descriptionEdit;
+    QTableWidget *product_table;
+    QLineEdit *name_edit;
+    QLineEdit *category_edit;
+    QDoubleSpinBox *price_spin_box;
+    QSpinBox *quantity_spin_box;
+    QLineEdit *description_edit;
 
-    InventoryManager inventoryManager;
+    InventoryManager inventory_manager;
 };

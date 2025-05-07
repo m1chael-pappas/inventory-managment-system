@@ -1,5 +1,5 @@
 
-#include "includes/MainWindow.h"
+#include "includes/main_window.h"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>

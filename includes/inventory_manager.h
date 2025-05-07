@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include "Product.h"
+#include "product.h"
 
 // Custom exceptions
 /**
@@ -54,7 +54,7 @@ class InventoryManager
 {
 private:
     std::vector<Product> products;
-    int nextProductId;
+    int next_product_id;
 
 public:
     /**
@@ -69,22 +69,22 @@ public:
      * @param product The product to add (ID will be assigned automatically)
      * @return The ID assigned to the new product
      */
-    int addProduct(const Product &product);
+    int add_product(const Product &product);
 
     /**
      * @brief Update an existing product's details
      * @param id The ID of the product to update
-     * @param updatedProduct The product with updated values
+     * @param updated_product The product with updated values
      * @throws ProductNotFoundException If the product with the given ID doesn't exist
      */
-    void updateProduct(int id, const Product &updatedProduct);
+    void update_product(int id, const Product &updated_product);
 
     /**
      * @brief Remove a product from the inventory
      * @param id The ID of the product to remove
      * @throws ProductNotFoundException If the product with the given ID doesn't exist
      */
-    void removeProduct(int id);
+    void remove_product(int id);
 
     /**
      * @brief Get a product by its ID
@@ -92,46 +92,47 @@ public:
      * @return The product with the specified ID
      * @throws ProductNotFoundException If the product with the given ID doesn't exist
      */
-    Product getProductById(int id) const;
+    Product get_product_by_id(int id) const;
 
     /**
      * @brief Find products by matching their name
      * @param name The name or partial name to search for
      * @return A vector of products whose names contain the search term
      */
-    std::vector<Product> findProductsByName(const std::string &name) const;
+    std::vector<Product> find_products_by_name(const std::string &name) const;
 
     /**
      * @brief Find products by exact category match
      * @param category The category to search for
      * @return A vector of products in the specified category
      */
-    std::vector<Product> findProductsByCategory(const std::string &category) const;
+    std::vector<Product> find_products_by_category(const std::string &category) const;
+
     /**
      * @brief Get all products in the inventory
      * @return A const reference to the vector of all products
      */
-    const std::vector<Product> &getAllProducts() const;
+    const std::vector<Product> &get_all_products() const;
 
     // Inventory statistics
     /**
      * @brief Get the total number of unique products in the inventory
      * @return The count of products
      */
-    int getTotalProductCount() const;
+    int get_total_product_count() const;
 
     /**
      * @brief Calculate the total monetary value of all inventory
      * @return The sum of (price * quantity) for all products
      */
-    double getTotalInventoryValue() const;
+    double get_total_inventory_value() const;
 
     /**
      * @brief Find products with stock below a specified threshold
      * @param threshold The quantity threshold below which products are considered low stock
      * @return A vector of products with quantity less than the threshold
      */
-    std::vector<Product> getLowStockProducts(int threshold) const;
+    std::vector<Product> get_low_stock_products(int threshold) const;
 
     // File operations
     /**
@@ -139,12 +140,12 @@ public:
      * @param filename The name of the file to save to
      * @throws FileOperationException If the file cannot be opened or written to
      */
-    void saveToFile(const std::string &filename);
+    void save_to_file(const std::string &filename);
 
     /**
      * @brief Load inventory from a CSV file
      * @param filename The name of the file to load from
      * @throws FileOperationException If the file cannot be opened or read from
      */
-    void loadFromFile(const std::string &filename);
+    void load_from_file(const std::string &filename);
 };

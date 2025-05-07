@@ -7,10 +7,10 @@ TEMPLATE = app
 CONFIG += c++11
 
 SOURCES += src/main.cpp \
-    src/Product.cpp \
-    src/InventoryManager.cpp \
-    src/MainWindow.cpp
+    src/product.cpp \
+    src/inventory_management.cpp \
+    src/main_window.cpp
 
-HEADERS += includes/Product.h \
-    includes/InventoryManager.h \
-    includes/MainWindow.h
+HEADERS += includes/product.h \
+    includes/inventory_management.h \
+    includes/main_window.h

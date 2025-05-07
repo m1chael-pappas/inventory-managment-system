@@ -1,35 +1,34 @@
-#include "includes/InventoryManager.h"
+#include "includes/inventory_manager.h"
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 
-InventoryManager::InventoryManager() : nextProductId(1) {}
+InventoryManager::InventoryManager() : next_product_id(1) {}
 
-int InventoryManager::addProduct(const Product &product)
+int InventoryManager::add_product(const Product &product)
 {
     // Create a new product with the next available ID
-    Product newProduct = product;
-    newProduct.setId(nextProductId++);
+    Product new_product = product;
+    new_product.set_id(next_product_id++);
 
     // Add to vector
-    products.push_back(newProduct);
-    return newProduct.getId();
+    products.push_back(new_product);
+    return new_product.get_id();
 }
 
-void InventoryManager::updateProduct(int id, const Product &updatedProduct)
+void InventoryManager::update_product(int id, const Product &updated_product)
 {
     auto it = std::find_if(products.begin(), products.end(),
                            [id](const Product &p)
-                           { return p.getId() == id; });
+                           { return p.get_id() == id; });
 
     if (it != products.end())
     {
-
-        it->setName(updatedProduct.getName());
-        it->setCategory(updatedProduct.getCategory());
-        it->setPrice(updatedProduct.getPrice());
-        it->setQuantity(updatedProduct.getQuantity());
-        it->setDescription(updatedProduct.getDescription());
+        it->set_name(updated_product.get_name());
+        it->set_category(updated_product.get_category());
+        it->set_price(updated_product.get_price());
+        it->set_quantity(updated_product.get_quantity());
+        it->set_description(updated_product.get_description());
     }
     else
     {
@@ -37,11 +36,11 @@ void InventoryManager::updateProduct(int id, const Product &updatedProduct)
     }
 }
 
-void InventoryManager::removeProduct(int id)
+void InventoryManager::remove_product(int id)
 {
     auto it = std::find_if(products.begin(), products.end(),
                            [id](const Product &p)
-                           { return p.getId() == id; });
+                           { return p.get_id() == id; });
 
     if (it != products.end())
     {
@@ -53,11 +52,11 @@ void InventoryManager::removeProduct(int id)
     }
 }
 
-Product InventoryManager::getProductById(int id) const
+Product InventoryManager::get_product_by_id(int id) const
 {
     auto it = std::find_if(products.begin(), products.end(),
                            [id](const Product &p)
-                           { return p.getId() == id; });
+                           { return p.get_id() == id; });
 
     if (it != products.end())
     {
@@ -69,12 +68,12 @@ Product InventoryManager::getProductById(int id) const
     }
 }
 
-std::vector<Product> InventoryManager::findProductsByName(const std::string &name) const
+std::vector<Product> InventoryManager::find_products_by_name(const std::string &name) const
 {
     std::vector<Product> result;
     for (const auto &product : products)
     {
-        if (product.getName().find(name) != std::string::npos)
+        if (product.get_name().find(name) != std::string::npos)
         {
             result.push_back(product);
         }
@@ -82,12 +81,12 @@ std::vector<Product> InventoryManager::findProductsByName(const std::string &nam
     return result;
 }
 
-std::vector<Product> InventoryManager::findProductsByCategory(const std::string &category) const
+std::vector<Product> InventoryManager::find_products_by_category(const std::string &category) const
 {
     std::vector<Product> result;
     for (const auto &product : products)
     {
-        if (product.getCategory() == category)
+        if (product.get_category() == category)
         {
             result.push_back(product);
         }
@@ -95,32 +94,32 @@ std::vector<Product> InventoryManager::findProductsByCategory(const std::string 
     return result;
 }
 
-const std::vector<Product> &InventoryManager::getAllProducts() const
+const std::vector<Product> &InventoryManager::get_all_products() const
 {
     return products;
 }
 
-int InventoryManager::getTotalProductCount() const
+int InventoryManager::get_total_product_count() const
 {
     return products.size();
 }
 
-double InventoryManager::getTotalInventoryValue() const
+double InventoryManager::get_total_inventory_value() const
 {
     double total = 0.0;
     for (const auto &product : products)
     {
-        total += product.getTotalValue();
+        total += product.get_total_value();
     }
     return total;
 }
 
-std::vector<Product> InventoryManager::getLowStockProducts(int threshold) const
+std::vector<Product> InventoryManager::get_low_stock_products(int threshold) const
 {
     std::vector<Product> result;
     for (const auto &product : products)
     {
-        if (product.isLowStock(threshold))
+        if (product.is_low_stock(threshold))
         {
             result.push_back(product);
         }
@@ -128,7 +127,7 @@ std::vector<Product> InventoryManager::getLowStockProducts(int threshold) const
     return result;
 }
 
-void InventoryManager::saveToFile(const std::string &filename)
+void InventoryManager::save_to_file(const std::string &filename)
 {
     std::ofstream file(filename);
     if (!file.is_open())
@@ -138,18 +137,18 @@ void InventoryManager::saveToFile(const std::string &filename)
 
     for (const auto &product : products)
     {
-        file << product.getId() << ','
-             << product.getName() << ','
-             << product.getCategory() << ','
-             << product.getPrice() << ','
-             << product.getQuantity() << ','
-             << product.getDescription() << '\n';
+        file << product.get_id() << ','
+             << product.get_name() << ','
+             << product.get_category() << ','
+             << product.get_price() << ','
+             << product.get_quantity() << ','
+             << product.get_description() << '\n';
     }
 
     file.close();
 }
 
-void InventoryManager::loadFromFile(const std::string &filename)
+void InventoryManager::load_from_file(const std::string &filename)
 {
     std::ifstream file(filename);
     if (!file.is_open())
@@ -158,7 +157,7 @@ void InventoryManager::loadFromFile(const std::string &filename)
     }
 
     products.clear();
-    nextProductId = 1;
+    next_product_id = 1;
 
     std::string line;
     while (std::getline(file, line))
@@ -177,7 +176,7 @@ void InventoryManager::loadFromFile(const std::string &filename)
             try
             {
                 id = std::stoi(token);
-                nextProductId = std::max(nextProductId, id + 1);
+                next_product_id = std::max(next_product_id, id + 1);
             }
             catch (const std::exception &e)
             {
