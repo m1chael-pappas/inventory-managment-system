@@ -2,6 +2,8 @@
   "files.associations": {
     "iomanip": "cpp",
     "stdexcept": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "thread": "cpp",
+    "string": "cpp"
   }
 }

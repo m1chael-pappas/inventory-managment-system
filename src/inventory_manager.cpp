@@ -135,14 +135,29 @@ void InventoryManager::save_to_file(const std::string &filename)
         throw FileOperationException("open", filename);
     }
 
+    // Write header
+    file << "ID,Name,Category,Price,Quantity,Description,Total Value\n";
+
     for (const auto &product : products)
     {
-        file << product.get_id() << ','
-             << product.get_name() << ','
-             << product.get_category() << ','
-             << product.get_price() << ','
-             << product.get_quantity() << ','
-             << product.get_description() << '\n';
+        double total_value = product.get_total_value();
+
+        file << product.get_id() << ",";
+
+        // Escape name with quotes
+        file << "\"" << replace_all(product.get_name(), "\"", "\"\"") << "\",";
+
+        // Escape category with quotes
+        file << "\"" << replace_all(product.get_category(), "\"", "\"\"") << "\",";
+
+        file << product.get_price() << ","
+             << product.get_quantity() << ",";
+
+        // Escape description with quotes
+        file << "\"" << replace_all(product.get_description(), "\"", "\"\"") << "\",";
+
+        // Add total value
+        file << total_value << "\n";
     }
 
     file.close();
@@ -225,4 +240,15 @@ void InventoryManager::load_from_file(const std::string &filename)
     }
 
     file.close();
+}
+
+std::string InventoryManager::replace_all(std::string str, const std::string &from, const std::string &to)
+{
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+    {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+    return str;
 }

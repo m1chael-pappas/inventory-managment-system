@@ -148,4 +148,13 @@ public:
      * @throws FileOperationException If the file cannot be opened or read from
      */
     void load_from_file(const std::string &filename);
+
+    /**
+     * @brief Replace all occurrences of a substring in a string
+     * @param str The original string
+     * @param from The substring to replace
+     * @param to The substring to replace with
+     * @return The modified string with replacements
+     */
+    std::string replace_all(std::string str, const std::string &from, const std::string &to);
 };

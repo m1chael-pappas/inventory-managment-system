@@ -87,6 +87,32 @@ private slots:
      */
     void export_to_csv();
 
+    /**
+     * @brief Import inventory data from a CSV file
+     */
+    void import_from_csv();
+
+    /**
+     * @brief Search for products by name
+     */
+    void search_by_name();
+
+    /**
+     * @brief Search for products by category
+     */
+    void search_by_category();
+
+    /**
+     * @brief Display low stock products
+     * @param threshold The quantity threshold below which products are considered low stock
+     */
+    void show_low_stock_products(int threshold = 10);
+
+    /**
+     * @brief Reset the search filter and show all products
+     */
+    void reset_search();
+
 private:
     QTableWidget *product_table;
     QLineEdit *name_edit;
@@ -94,6 +120,17 @@ private:
     QDoubleSpinBox *price_spin_box;
     QSpinBox *quantity_spin_box;
     QLineEdit *description_edit;
+
+    // Search components
+    QLineEdit *search_edit;
+    QPushButton *search_name_button;
+    QPushButton *search_category_button;
+    QPushButton *reset_search_button;
+    QPushButton *low_stock_button;
+
+    // File operation buttons
+    QPushButton *import_button;
+    QPushButton *export_button;
 
     InventoryManager inventory_manager;
 };
