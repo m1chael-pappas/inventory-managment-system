@@ -175,73 +175,90 @@ void InventoryManager::load_from_file(const std::string &filename)
     next_product_id = 1;
 
     std::string line;
+    // Skip header line
+    std::getline(file, line);
+
     while (std::getline(file, line))
     {
-        std::stringstream ss(line);
-        std::string token;
+        if (line.empty())
+            continue;
 
         int id = 0;
         std::string name, category, description;
         double price = 0.0;
         int quantity = 0;
 
-        // Parse ID
-        if (std::getline(ss, token, ','))
+        // CSV parsing state
+        size_t pos = 0;
+        bool in_quotes = false;
+        std::vector<std::string> fields;
+        std::string current_field;
+
+        // Parse CSV row manually to handle quoted fields
+        while (pos < line.length())
         {
-            try
+            char c = line[pos];
+
+            if (c == '"')
             {
-                id = std::stoi(token);
-                next_product_id = std::max(next_product_id, id + 1);
+                // Toggle quote state
+                in_quotes = !in_quotes;
+
+                // Check for escaped quotes (two quotes in a row)
+                if (in_quotes && pos + 1 < line.length() && line[pos + 1] == '"')
+                {
+                    current_field += '"';
+                    pos += 2; // Skip both quotes
+                }
+                else
+                {
+                    pos++; // Skip the quote character
+                }
             }
-            catch (const std::exception &e)
+            else if (c == ',' && !in_quotes)
             {
-                continue; // Skip invalid line
+                // End of field
+                fields.push_back(current_field);
+                current_field.clear();
+                pos++;
+            }
+            else
+            {
+                // Regular character
+                current_field += c;
+                pos++;
             }
         }
 
-        // Parse name
-        if (!std::getline(ss, name, ','))
+        // Don't forget the last field
+        fields.push_back(current_field);
+
+        // Now process the fields
+        if (fields.size() < 6) // Need at least ID, name, category, price, quantity, description
             continue;
 
-        // Parse category
-        if (!std::getline(ss, category, ','))
+        try
+        {
+            id = std::stoi(fields[0]);
+            next_product_id = std::max(next_product_id, id + 1);
+
+            name = fields[1];
+            category = fields[2];
+            price = std::stod(fields[3]);
+            quantity = std::stoi(fields[4]);
+            description = fields[5];
+
+            products.emplace_back(id, name, category, price, quantity, description);
+        }
+        catch (const std::exception &e)
+        {
+            // Skip invalid line
             continue;
-
-        // Parse price
-        if (std::getline(ss, token, ','))
-        {
-            try
-            {
-                price = std::stod(token);
-            }
-            catch (const std::exception &e)
-            {
-                continue; // Skip invalid line
-            }
         }
-
-        // Parse quantity
-        if (std::getline(ss, token, ','))
-        {
-            try
-            {
-                quantity = std::stoi(token);
-            }
-            catch (const std::exception &e)
-            {
-                continue; // Skip invalid line
-            }
-        }
-
-        // Parse description
-        std::getline(ss, description);
-
-        products.emplace_back(id, name, category, price, quantity, description);
     }
 
     file.close();
 }
-
 std::string InventoryManager::replace_all(std::string str, const std::string &from, const std::string &to)
 {
     size_t start_pos = 0;
